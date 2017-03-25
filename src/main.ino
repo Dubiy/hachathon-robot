@@ -27,28 +27,22 @@
 #define WIFI_SSID "ekreative"
 #define WIFI_PASSWORD "yabloka346"
 
-
-
-const int grovePowerPin = 15;
-const int vibratorPin = 5;
-const int lightSensorPin = A0;
-const int ledPin = 12;
-const int buttonPin = 14;
-const int fanPin = 13;
+const int MOTOR_L1 = 5; // D1
+const int MOTOR_L2 = 4; // D2
+const int MOTOR_R1 = 0; // D3
+const int MOTOR_R2 = 2; // D4
+const String ROBOT_ID = "";
+const bool DEBUG = true;
 
 void setup() {
 
   Serial.begin(115200);
   Serial.print("start");
 
-  pinMode(grovePowerPin, OUTPUT);
-  digitalWrite(grovePowerPin, HIGH);
-
-  pinMode(vibratorPin, OUTPUT);
-  pinMode(lightSensorPin, INPUT);
-  pinMode(ledPin, OUTPUT);
-  pinMode(buttonPin, INPUT);
-  pinMode(fanPin, OUTPUT);
+  pinMode(MOTOR_L1, OUTPUT);
+  pinMode(MOTOR_L2, OUTPUT);
+  pinMode(MOTOR_R1, OUTPUT);
+  pinMode(MOTOR_R2, OUTPUT);
 
   // connect to wifi.
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
@@ -62,37 +56,73 @@ void setup() {
   Serial.println(WiFi.localIP());
 
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
-  Firebase.set("pushbutton", 0);
-  Firebase.set("sunlight", 0);
-  Firebase.set("redlight", 0);
-  Firebase.set("cooldown", 0);
-  Firebase.set("brrr", 0);
+  // Firebase.set("pushbutton", 0);
+  // Firebase.set("sunlight", 0);
+  // Firebase.set("redlight", 0);
+  // Firebase.set("cooldown", 0);
+  // Firebase.set("brrr", 0);
 
 }
 
-int button = 0;
-float light = 0.0;
-bool b = true;
+
+
+int motor_l = 0;
+int motor_r = 0;
 
 void loop() {
-  Serial.print(" loop ");
+  Serial.println("loop ");
 
+  motor_l = Firebase.getInt(ROBOT_ID + "motor_l");
+  motor_r = Firebase.getInt(ROBOT_ID + "motor_r");
 
-  digitalWrite(ledPin, Firebase.getInt("redlight"));
-  digitalWrite(fanPin, Firebase.getInt("cooldown"));
-  digitalWrite(vibratorPin, Firebase.getInt("brrr"));
+  setMotorState(motor_l, motor_r);
 
- int newButton = digitalRead(buttonPin);
-  if (newButton != button) {
-    button = newButton;
-    Firebase.setInt("pushbutton", button);
-  }
-  float newLight = analogRead(lightSensorPin);
-  if (abs(newLight - light) > 100) {
-    light = newLight;
-    Firebase.setFloat("sunlight", light);
-  }
+ // int newButton = digitalRead(buttonPin);
+ //  if (newButton != button) {
+ //    button = newButton;
+ //    Firebase.setInt("pushbutton", button);
+ //  }
+ //  float newLight = analogRead(lightSensorPin);
+ //  if (abs(newLight - light) > 100) {
+ //    light = newLight;
+ //    Firebase.setFloat("sunlight", light);
+ //  }
 
   delay(200);
 
+}
+
+void setMotorState(int motor_l, int motor_r) {
+  int motor_l1 = 0,
+      motor_l2 = 0,
+      motor_r1 = 0,
+      motor_r2 = 0;
+
+  if (motor_l > 0) {
+    motor_l1 = motor_l;
+  } else {
+    motor_l2 = motor_l;
+  }
+
+  if (motor_r > 0) {
+    motor_r1 = motor_r;
+  } else {
+    motor_r2 = motor_l;
+  }
+
+  if (DEBUG) {
+    Serial.print("motor_l1 = ");
+    Serial.print(motor_l1);
+    Serial.print(". motor_l2 = ");
+    Serial.print(motor_l2);
+    Serial.print(". motor_r1 = ");
+    Serial.print(motor_r1);
+    Serial.print(". motor_r2 = ");
+    Serial.println(motor_r2);
+  }
+
+  analogWrite(MOTOR_L1, motor_l1);
+  analogWrite(MOTOR_L2, motor_l2);
+  analogWrite(MOTOR_R1, motor_r1);
+  analogWrite(MOTOR_R2, motor_r2);
 }
