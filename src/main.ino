@@ -101,13 +101,13 @@ void setMotorState(int motor_l, int motor_r) {
   if (motor_l > 0) {
     motor_l1 = motor_l;
   } else {
-    motor_l2 = motor_l;
+    motor_l2 = abs(motor_l);
   }
 
   if (motor_r > 0) {
     motor_r1 = motor_r;
   } else {
-    motor_r2 = motor_l;
+    motor_r2 = abs(motor_r);
   }
 
   if (DEBUG) {
