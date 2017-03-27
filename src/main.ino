@@ -43,9 +43,9 @@ const int SERVO =  15;  // D8
 
 
 
-const String ROBOT_ID = "cheb_";
+// const String ROBOT_ID = "cheb_";
 // const String ROBOT_ID = "kirill_";
-// const String ROBOT_ID = "gary_";
+const String ROBOT_ID = "gary_";
 const bool DEBUG = true;
 
 Servo servo;
